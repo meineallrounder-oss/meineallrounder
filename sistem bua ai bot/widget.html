@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Widget - Integration Example</title>
+    
+    <!-- Chatbot Widget CSS -->
+    <link rel="stylesheet" href="css/chatbot-widget.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Chatbot Widget - Integration Example</h1>
+        <p>This is an example page showing how to integrate the chatbot widget into your website.</p>
+        
+        <h2>Integration Steps:</h2>
+        <ol>
+            <li>Copy the <code>chat/</code> folder to your website</li>
+            <li>Create <code>.env</code> file with your OpenAI API key</li>
+            <li>Customize <code>config.php</code> with your company information</li>
+            <li>Add the widget HTML and CSS/JS to your pages</li>
+        </ol>
+        
+        <h2>HTML Code to Add:</h2>
+        <pre><code>&lt;!-- Chatbot Widget CSS --&gt;
+&lt;link rel="stylesheet" href="chat/css/chatbot-widget.css"&gt;
+
+&lt;!-- Chatbot Widget HTML (add before &lt;/body&gt;) --&gt;
+&lt;div id="chatbot-widget"&gt;
+    &lt;div id="chatbot-container"&gt;
+        &lt;div id="chatbot-header"&gt;
+            &lt;div class="chatbot-header-content"&gt;
+                &lt;div class="chatbot-header-brand"&gt;
+                    &lt;img src="your-logo.png" alt="Your Company" class="chatbot-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"&gt;
+                    &lt;div class="chatbot-logo-fallback" style="display: none;"&gt;
+                        &lt;span class="logo-main"&gt;Your&lt;/span&gt;
+                        &lt;span class="logo-accent"&gt;Company&lt;/span&gt;
+                    &lt;/div&gt;
+                    &lt;div class="chatbot-header-text"&gt;
+                        &lt;p&gt;KI Asistent!&lt;/p&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class="chatbot-header-actions"&gt;
+                    &lt;button id="chatbot-minimize" class="chatbot-header-btn" title="Minimieren"&gt;
+                        &lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"&gt;
+                            &lt;line x1="5" y1="12" x2="19" y2="12"/&gt;
+                        &lt;/svg&gt;
+                    &lt;/button&gt;
+                    &lt;button id="chatbot-close" class="chatbot-header-btn" title="Schließen"&gt;
+                        &lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"&gt;
+                            &lt;line x1="18" y1="6" x2="6" y2="18"/&gt;
+                            &lt;line x1="6" y1="6" x2="18" y2="18"/&gt;
+                        &lt;/svg&gt;
+                    &lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div id="chatbot-messages"&gt;
+            &lt;div class="chatbot-message bot"&gt;
+                &lt;div class="chatbot-message-content"&gt;
+                    Hallo! Willkommen bei [Your Company]. Wie kann ich Ihnen heute helfen?
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div id="chatbot-input-container"&gt;
+            &lt;input type="text" id="chatbot-input" placeholder="Nachricht eingeben..."&gt;
+            &lt;button id="chatbot-send"&gt;Senden&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;button id="chatbot-toggle"&gt;
+        &lt;span class="chatbot-toggle-emoji"&gt;💬&lt;/span&gt;
+        &lt;span class="chatbot-toggle-text"&gt;KI Asistent&lt;/span&gt;
+    &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- Chatbot Widget JavaScript --&gt;
+&lt;script src="chat/js/chatbot-widget.js"&gt;&lt;/script&gt;</code></pre>
+        
+        <h2>Configuration:</h2>
+        <ul>
+            <li><strong>.env file:</strong> Add <code>OPENAI_API_KEY=your_key_here</code></li>
+            <li><strong>config.php:</strong> Customize with your company information</li>
+            <li><strong>chat-admin.php:</strong> Change password (line 14)</li>
+        </ul>
+        
+        <h2>Admin Panel:</h2>
+        <p>Access chat logs at: <code>chat/chat-admin.php</code></p>
+    </div>
+    
+    <!-- Chatbot Widget HTML -->
+    <div id="chatbot-widget">
+        <div id="chatbot-container">
+            <div id="chatbot-header">
+                <div class="chatbot-header-content">
+                    <div class="chatbot-header-brand">
+                        <div class="chatbot-logo-fallback" style="display: flex;">
+                            <span class="logo-main">Chat</span>
+                            <span class="logo-accent">Bot</span>
+                        </div>
+                        <div class="chatbot-header-text">
+                            <p>KI Asistent!</p>
+                        </div>
+                    </div>
+                    <div class="chatbot-header-actions">
+                        <button id="chatbot-minimize" class="chatbot-header-btn" title="Minimieren">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </button>
+                        <button id="chatbot-close" class="chatbot-header-btn" title="Schließen">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="chatbot-messages">
+                <div class="chatbot-message bot">
+                    <div class="chatbot-message-content">
+                        Hallo! Willkommen! Wie kann ich Ihnen heute helfen?
+                    </div>
+                </div>
+            </div>
+            <div id="chatbot-input-container">
+                <input type="text" id="chatbot-input" placeholder="Nachricht eingeben...">
+                <button id="chatbot-send">Senden</button>
+            </div>
+        </div>
+        <button id="chatbot-toggle">
+            <span class="chatbot-toggle-emoji">💬</span>
+            <span class="chatbot-toggle-text">KI Asistent</span>
+        </button>
+    </div>
+    
+    <!-- Chatbot Widget JavaScript -->
+    <script src="js/chatbot-widget.js"></script>
+</body>
+</html>
+

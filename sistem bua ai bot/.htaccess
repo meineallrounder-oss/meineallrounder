@@ -1,0 +1,18 @@
+# Protect .env file
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Protect config.php (optional - uncomment if you want to restrict access)
+# <Files "config.php">
+#     Order allow,deny
+#     Deny from all
+# </Files>
+
+# Allow API access
+<Files "api.php">
+    Order allow,deny
+    Allow from all
+</Files>
+

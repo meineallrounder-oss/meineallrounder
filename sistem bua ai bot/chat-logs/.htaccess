@@ -1,0 +1,4 @@
+# Deny all access to chat logs directory
+Order Deny,Allow
+Deny from all
+
