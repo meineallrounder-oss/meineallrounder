@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Chatbot Widget</title>
+    <link rel="stylesheet" href="verabot/css/chatbot-widget.css">
+    <style>
+        body {
+            padding: 50px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Chatbot Widget</h1>
+    <p>Ovaj test proverava da li se widget prikazuje.</p>
+    
+    <!-- Chatbot Widget Configuration -->
+    <script type="application/json" data-chatbot-config>
+    {
+        "companyName": "Meine Allrounder",
+        "welcomeMessage": "Hallo! Willkommen bei Meine Allrounder. Wie kann ich Ihnen heute helfen?",
+        "toggleText": "KI Asistent",
+        "logoUrl": null
+    }
+    </script>
+    
+    <!-- Chatbot Widget JavaScript -->
+    <script src="verabot/js/chatbot-widget.js"></script>
+    
+    <script>
+        // Additional debugging
+        setTimeout(function() {
+            const widget = document.getElementById('chatbot-widget');
+            const toggle = document.getElementById('chatbot-toggle');
+            console.log('=== Widget Debug Info ===');
+            console.log('Widget element:', widget);
+            console.log('Toggle element:', toggle);
+            if (widget) {
+                console.log('Widget computed style:', window.getComputedStyle(widget));
+                console.log('Widget display:', window.getComputedStyle(widget).display);
+                console.log('Widget visibility:', window.getComputedStyle(widget).visibility);
+                console.log('Widget position:', window.getComputedStyle(widget).position);
+                console.log('Widget z-index:', window.getComputedStyle(widget).zIndex);
+            }
+            if (toggle) {
+                console.log('Toggle computed style:', window.getComputedStyle(toggle));
+                console.log('Toggle display:', window.getComputedStyle(toggle).display);
+                console.log('Toggle visibility:', window.getComputedStyle(toggle).visibility);
+                console.log('Toggle classes:', toggle.className);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
+

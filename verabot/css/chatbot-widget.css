@@ -32,7 +32,7 @@
     display: none;
     width: 440px;
     height: 680px;
-    background: rgba(255, 255, 255, 0.98);
+    background: var(--chatbot-bg-color, rgba(255, 255, 255, 0.98));
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 24px;
@@ -62,7 +62,7 @@
 }
 
 #chatbot-header {
-    background: linear-gradient(135deg, #ea580c 0%, #fb923c 50%, #ea580c 100%);
+    background: linear-gradient(135deg, var(--chatbot-header-color, #ea580c) 0%, var(--chatbot-header-color-secondary, #fb923c) 50%, var(--chatbot-header-color, #ea580c) 100%);
     background-size: 200% 200%;
     animation: gradientShift 3s ease infinite;
     color: #ffffff;
@@ -303,7 +303,7 @@
 }
 
 .chatbot-message.user .chatbot-message-content {
-    background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
+    background: linear-gradient(135deg, var(--chatbot-user-message-color, #ea580c) 0%, var(--chatbot-user-message-color-secondary, #fb923c) 100%);
     color: #ffffff;
     border-bottom-right-radius: 8px;
     font-weight: 500;
@@ -365,7 +365,7 @@
 
 #chatbot-send {
     padding: 16px 28px;
-    background: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
+    background: linear-gradient(135deg, var(--chatbot-universal-color, #ea580c) 0%, var(--chatbot-user-message-color-secondary, #fb923c) 100%);
     color: #ffffff;
     border: none;
     border-radius: 28px;
@@ -409,7 +409,7 @@
     padding: 0 20px;
     border-radius: 50px;
     background: #FFFFFF;
-    border: 3px solid #ea580c;
+    border: 3px solid var(--chatbot-toggle-color, #ea580c);
     cursor: pointer;
     box-shadow: 
         0 8px 24px rgba(234, 88, 12, 0.6),
@@ -456,7 +456,7 @@
 
 .chatbot-toggle-text {
     font-size: 15px;
-    color: #ea580c;
+    color: var(--chatbot-toggle-color, #ea580c);
     font-weight: 700;
     letter-spacing: 0.3px;
     white-space: nowrap;

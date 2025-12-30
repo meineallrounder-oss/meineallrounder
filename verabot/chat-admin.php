@@ -305,6 +305,7 @@ if (is_dir($log_dir)) {
                     </option>
                 <?php endforeach; ?>
             </select>
+            <button onclick="window.location.href='chatbot-admin.php'">⚙️ Settings</button>
             <button onclick="window.location.reload()">🔄 Aktualisieren</button>
             <button onclick="window.location.href='?logout=1'">🚪 Abmelden</button>
         </div>

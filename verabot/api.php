@@ -23,37 +23,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load configuration
 $config = require __DIR__ . '/config.php';
 
-// Load OpenAI API Key from .env
+// Load OpenAI API Key - Check config.php FIRST (highest priority)
 $OPENAI_API_KEY = '';
-$env_paths = [
-    __DIR__ . '/.env',
-    __DIR__ . '/../.env',
-    $_SERVER['DOCUMENT_ROOT'] . '/../.env',
-    '/home/' . get_current_user() . '/.env'
-];
+$api_key_source = 'none';
 
-foreach ($env_paths as $env_path) {
-    if (file_exists($env_path)) {
-        $env_file = file_get_contents($env_path);
-        preg_match('/OPENAI_API_KEY\s*=\s*(.+)/', $env_file, $matches);
-        if (!empty($matches[1])) {
-            $OPENAI_API_KEY = trim($matches[1]);
-            break;
+// Check chatbot settings for API key (if set in admin panel) - Highest priority
+// This allows admin panel to override .env file
+if (isset($config['chatbot_settings']['openai_api_key']) && !empty($config['chatbot_settings']['openai_api_key'])) {
+    $OPENAI_API_KEY = trim($config['chatbot_settings']['openai_api_key']);
+    $api_key_source = 'config.php';
+}
+
+// If not in config, try .env files
+if (empty($OPENAI_API_KEY)) {
+    $env_paths = [
+        __DIR__ . '/.env',
+        __DIR__ . '/env',  // Also check 'env' without dot
+        __DIR__ . '/../.env',
+        $_SERVER['DOCUMENT_ROOT'] . '/../.env',
+        '/home/' . get_current_user() . '/.env'
+    ];
+
+    foreach ($env_paths as $env_path) {
+        if (file_exists($env_path)) {
+            $env_file = file_get_contents($env_path);
+            preg_match('/OPENAI_API_KEY\s*=\s*(.+)/', $env_file, $matches);
+            if (!empty($matches[1])) {
+                $OPENAI_API_KEY = trim($matches[1]);
+                $api_key_source = basename($env_path);
+                break;
+            }
         }
     }
 }
 
 // Fallback to environment variable
 if (empty($OPENAI_API_KEY)) {
-    $OPENAI_API_KEY = getenv('OPENAI_API_KEY') ?: '';
+    $env_key = getenv('OPENAI_API_KEY');
+    if (!empty($env_key)) {
+        $OPENAI_API_KEY = $env_key;
+        $api_key_source = 'environment variable';
+    }
 }
 
 // Check if API key is set
 if (empty($OPENAI_API_KEY)) {
     http_response_code(500);
+    
+    // Debug info (only in development - remove in production)
+    $debug_info = [
+        'api_key_source' => $api_key_source,
+        'config_key_exists' => isset($config['chatbot_settings']['openai_api_key']),
+        'config_key_empty' => empty($config['chatbot_settings']['openai_api_key'] ?? ''),
+        'env_files_checked' => []
+    ];
+    
+    // Check which env files exist
+    $env_paths = [
+        __DIR__ . '/.env',
+        __DIR__ . '/env',
+        __DIR__ . '/../.env',
+    ];
+    
+    foreach ($env_paths as $env_path) {
+        $debug_info['env_files_checked'][] = [
+            'path' => $env_path,
+            'exists' => file_exists($env_path),
+            'readable' => file_exists($env_path) ? is_readable($env_path) : false
+        ];
+    }
+    
     echo json_encode([
         'error' => 'API Key not configured',
-        'response' => 'Entschuldigung, der Chatbot ist momentan nicht verfügbar. Bitte kontaktieren Sie uns unter ' . $config['contact']['email']
+        'response' => 'Entschuldigung, der Chatbot ist momentan nicht verfügbar. Bitte kontaktieren Sie uns unter ' . $config['contact']['email'],
+        'debug' => $debug_info
     ]);
     exit();
 }
@@ -197,10 +240,29 @@ if ($http_code !== 200) {
     http_response_code($http_code);
     $error_data = json_decode($response, true);
     $error_message = $error_data['error']['message'] ?? 'Unknown error';
+    $error_type = $error_data['error']['type'] ?? 'unknown';
+    
+    // Log the error for debugging
+    $log_dir = __DIR__ . '/chat-logs';
+    if (!is_dir($log_dir)) {
+        mkdir($log_dir, 0755, true);
+    }
+    $error_log = $log_dir . '/api-errors-' . date('Y-m-d') . '.log';
+    $error_entry = date('Y-m-d H:i:s') . " - HTTP $http_code - Type: $error_type - Message: $error_message\n";
+    file_put_contents($error_log, $error_entry, FILE_APPEND);
+    
+    // Provide more helpful error message
+    $user_message = 'Entschuldigung, es ist ein Fehler aufgetreten.';
+    if ($error_type === 'invalid_api_key' || strpos($error_message, 'api key') !== false) {
+        $user_message = 'Entschuldigung, der API-Schlüssel ist ungültig. Bitte kontaktieren Sie uns unter ' . $config['contact']['email'];
+    } elseif ($error_type === 'insufficient_quota' || strpos($error_message, 'quota') !== false) {
+        $user_message = 'Entschuldigung, das API-Kontingent ist aufgebraucht. Bitte kontaktieren Sie uns unter ' . $config['contact']['email'];
+    }
     
     echo json_encode([
         'error' => 'OpenAI API error: ' . $error_message,
-        'response' => 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.'
+        'error_type' => $error_type,
+        'response' => $user_message
     ]);
     exit();
 }
@@ -261,6 +323,7 @@ file_put_contents($master_log, json_encode($master_logs, JSON_PRETTY_PRINT | JSO
 // Return success response
 echo json_encode([
     'response' => $ai_response,
-    'status' => 'success'
+    'status' => 'success',
+    'api_key_source' => $api_key_source // Debug info - remove in production if needed
 ]);
 

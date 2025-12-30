@@ -121,25 +121,97 @@ faqItems.forEach(item => {
 // Contact Form
 const contactForm = document.getElementById('contactForm');
 
-contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Here you would normally send the form data to a server
-    // For now, we'll just show an alert
-    alert('Vielen Dank für Ihre Nachricht! Wir werden uns bald bei Ihnen melden.');
-    contactForm.reset();
-});
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Disable submit button
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Wird gesendet...';
+        
+        // Get form data
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            subject: document.getElementById('subject').value,
+            message: document.getElementById('message').value
+        };
+        
+        try {
+            const response = await fetch('contact-form.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                alert(data.message || 'Vielen Dank für Ihre Nachricht! Wir werden uns bald bei Ihnen melden.');
+                contactForm.reset();
+            } else {
+                alert(data.message || 'Es gab einen Fehler beim Senden Ihrer Nachricht. Bitte versuchen Sie es später erneut.');
+            }
+        } catch (error) {
+            console.error('Error sending form:', error);
+            alert('Es gab einen Fehler beim Senden Ihrer Nachricht. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns direkt unter info@meineallrounder.de');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
+}
 
 // Quick Quote Form
 const quickQuoteForm = document.querySelector('.quick-quote-form');
 
 if (quickQuoteForm) {
-    quickQuoteForm.addEventListener('submit', (e) => {
+    quickQuoteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Here you would normally send the form data to a server
-        alert('Vielen Dank für Ihre Anfrage! Wir werden Ihnen innerhalb von 24 Stunden ein unverbindliches Angebot zusenden.');
-        quickQuoteForm.reset();
+        // Disable submit button
+        const submitBtn = quickQuoteForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Wird gesendet...';
+        
+        // Get form data
+        const serviceValue = document.getElementById('quote-service').value;
+        const areaValue = document.getElementById('quote-area').value;
+        
+        const formData = {
+            name: document.getElementById('quote-name').value,
+            phone: document.getElementById('quote-phone').value,
+            service: serviceValue,
+            area: areaValue,
+            subject: 'Angebotsanfrage: ' + serviceValue,
+            message: 'Angebotsanfrage für ' + serviceValue + (areaValue ? ' (Fläche: ' + areaValue + ' m²)' : '')
+        };
+        
+        try {
+            const response = await fetch('contact-form.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                alert(data.message || 'Vielen Dank für Ihre Anfrage! Wir werden Ihnen innerhalb von 24 Stunden ein unverbindliches Angebot zusenden.');
+                quickQuoteForm.reset();
+            } else {
+                alert(data.message || 'Es gab einen Fehler beim Senden Ihrer Anfrage. Bitte versuchen Sie es später erneut.');
+            }
+        } catch (error) {
+            console.error('Error sending quote form:', error);
+            alert('Es gab einen Fehler beim Senden Ihrer Anfrage. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns direkt unter info@meineallrounder.de');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
     });
 }
 
@@ -236,14 +308,46 @@ if (scrollProgressBar) {
 const newsletterForm = document.getElementById('newsletterForm');
 
 if (newsletterForm) {
-    newsletterForm.addEventListener('submit', (e) => {
+    newsletterForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = newsletterForm.querySelector('input[type="email"]').value;
+        const emailInput = document.getElementById('newsletterEmail');
+        const email = emailInput ? emailInput.value : newsletterForm.querySelector('input[type="email"]').value;
         
-        // Here you would normally send the email to a server
-        // For now, we'll just show an alert
-        alert('Vielen Dank für Ihr Abonnement! Sie erhalten ab sofort unsere Neuigkeiten.');
-        newsletterForm.reset();
+        // Disable submit button
+        const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Wird abonniert...';
+        
+        try {
+            const formData = {
+                name: 'Newsletter Abonnent',
+                email: email,
+                subject: 'Newsletter Anmeldung',
+                message: 'Neue Newsletter-Anmeldung von der Website'
+            };
+            
+            const response = await fetch('contact-form.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                alert('Vielen Dank für Ihr Abonnement! Sie erhalten ab sofort unsere Neuigkeiten.');
+                newsletterForm.reset();
+            } else {
+                alert(data.message || 'Es gab einen Fehler beim Abonnieren. Bitte versuchen Sie es später erneut.');
+            }
+        } catch (error) {
+            console.error('Error subscribing to newsletter:', error);
+            alert('Es gab einen Fehler beim Abonnieren. Bitte versuchen Sie es später erneut.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
     });
 }
 

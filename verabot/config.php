@@ -8,7 +8,7 @@ return [
     'company_name' => 'Meine Allrounder',
     'website' => 'meineallrounder.de',
     'location' => 'Moers, Deutschland',
-    'address' => 'Moers, Deutschland',
+    'address' => 'Franzstr. 20, 47441 Moers, Deutschland',
     'founded' => '2024',
     'experience' => 'Professionelle Renovierungsarbeiten mit Qualität, Sauberkeit und Zuverlässigkeit',
     'owner' => [
@@ -48,6 +48,20 @@ return [
     ],
     'about' => 'Meine Allrounder ist ein professionelles Renovierungsunternehmen in Moers, Deutschland. Wir bieten hochwertige Renovierungsarbeiten für Haus und Wohnung mit Fokus auf Qualität, Sauberkeit und Kundenzufriedenheit.',
     'team' => 'Unser Team besteht aus erfahrenen Fachkräften unter der Leitung von Rajko Durdevic (CEO) und Jovica Mihajlovic (Marketing).',
-    'specialization' => 'Wir spezialisieren uns auf Badsanierungen, Fliesenarbeiten, Gipsarbeiten und komplette Hausrenovierungen in Moers und Umgebung.'
+    'specialization' => 'Wir spezialisieren uns auf Badsanierungen, Fliesenarbeiten, Gipsarbeiten und komplette Hausrenovierungen in Moers und Umgebung.',
+    
+    // Chatbot Appearance Settings (managed via chatbot-admin.php)
+    'chatbot_settings' => [
+        'header_color' => '#ea580c',
+        'header_color_secondary' => '#fb923c',
+        'user_message_color' => '#ea580c',
+        'user_message_color_secondary' => '#fb923c',
+        'toggle_button_color' => '#ea580c',
+        'background_color' => '#ffffff',
+        'universal_color' => '#ea580c',
+        'icon_emoji' => '💬',
+        'logo_url' => '',
+        'openai_api_key' => 'getenv("OPENAI_API_KEY") ?: ""'
+    ]
 ];
 
