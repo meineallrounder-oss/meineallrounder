@@ -231,9 +231,12 @@ curl_close($ch);
 // Handle errors
 if ($curl_error) {
     http_response_code(500);
+    // Log error for debugging
+    error_log("Chatbot API curl error: " . $curl_error);
     echo json_encode([
         'error' => 'Connection error: ' . $curl_error,
-        'response' => 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.'
+        'response' => 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.',
+        'debug' => 'Curl error occurred'
     ]);
     exit();
 }
@@ -247,24 +250,32 @@ if ($http_code !== 200) {
     // Log the error for debugging
     $log_dir = __DIR__ . '/chat-logs';
     if (!is_dir($log_dir)) {
-        mkdir($log_dir, 0755, true);
+        @mkdir($log_dir, 0755, true);
     }
-    $error_log = $log_dir . '/api-errors-' . date('Y-m-d') . '.log';
-    $error_entry = date('Y-m-d H:i:s') . " - HTTP $http_code - Type: $error_type - Message: $error_message\n";
-    file_put_contents($error_log, $error_entry, FILE_APPEND);
+    if (is_dir($log_dir)) {
+        $error_log = $log_dir . '/api-errors-' . date('Y-m-d') . '.log';
+        $error_entry = date('Y-m-d H:i:s') . " - HTTP $http_code - Type: $error_type - Message: $error_message\n";
+        @file_put_contents($error_log, $error_entry, FILE_APPEND);
+    }
+    
+    // Also log to PHP error log
+    error_log("Chatbot API error - HTTP $http_code - Type: $error_type - Message: $error_message");
     
     // Provide more helpful error message
-    $user_message = 'Entschuldigung, es ist ein Fehler aufgetreten.';
-    if ($error_type === 'invalid_api_key' || strpos($error_message, 'api key') !== false) {
+    $user_message = 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
+    if ($error_type === 'invalid_api_key' || strpos(strtolower($error_message), 'api key') !== false || strpos(strtolower($error_message), 'authentication') !== false) {
         $user_message = 'Entschuldigung, der API-Schlüssel ist ungültig. Bitte kontaktieren Sie uns unter ' . $config['contact']['email'];
-    } elseif ($error_type === 'insufficient_quota' || strpos($error_message, 'quota') !== false) {
+    } elseif ($error_type === 'insufficient_quota' || strpos(strtolower($error_message), 'quota') !== false || strpos(strtolower($error_message), 'billing') !== false) {
         $user_message = 'Entschuldigung, das API-Kontingent ist aufgebraucht. Bitte kontaktieren Sie uns unter ' . $config['contact']['email'];
+    } elseif ($error_type === 'rate_limit_exceeded' || strpos(strtolower($error_message), 'rate limit') !== false) {
+        $user_message = 'Entschuldigung, zu viele Anfragen. Bitte versuchen Sie es in ein paar Momenten erneut.';
     }
     
     echo json_encode([
         'error' => 'OpenAI API error: ' . $error_message,
         'error_type' => $error_type,
-        'response' => $user_message
+        'response' => $user_message,
+        'http_code' => $http_code
     ]);
     exit();
 }
