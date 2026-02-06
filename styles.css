@@ -294,12 +294,22 @@ body::before {
 }
 
 /* Mobile image - optimized for portrait orientation */
-/* If you have header-mobile.jpg, uncomment the line below and comment out the header.jpg line */
 @media (max-width: 768px) {
     .hero {
-        background-image: url('images/header.jpg'); /* Using same image for now - replace with header-mobile.jpg if you have a mobile-optimized version */
-        background-attachment: scroll; /* Better performance on mobile */
+        background-image: url('images/header.jpg');
+        background-attachment: scroll;
         background-position: center center;
+        background-size: cover;
+        min-height: 100vh;
+        margin-top: 0;
+    }
+    
+    .hero-overlay {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(30, 41, 59, 0.6) 100%);
+    }
+    
+    .hero::before {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.4) 100%);
     }
 }
 
@@ -2777,6 +2787,21 @@ body::before {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    body {
+        padding-top: 70px;
+    }
+    
     .nav-menu {
         position: fixed;
         left: -100%;
@@ -2788,6 +2813,7 @@ body::before {
         transition: 0.3s;
         box-shadow: 0 10px 27px rgba(0,0,0,0.05);
         padding: 2rem 0;
+        z-index: 999;
     }
 
     .nav-menu.active {
@@ -2801,38 +2827,73 @@ body::before {
     .nav-phone {
         display: none;
     }
+    
+    .nav-wrapper {
+        padding: 0.75rem 0;
+    }
+    
+    .logo img {
+        max-height: 40px;
+    }
 
     .hero-content {
-        padding: 6rem 0 4rem;
+        padding: 2rem 1rem 3rem;
         text-align: center;
+        width: 100%;
+        max-width: 100%;
     }
 
     .hero-content h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+        padding: 0 0.5rem;
     }
 
     .hero-content h2 {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
+        line-height: 1.4;
+        margin-bottom: 1.5rem;
+        padding: 0 0.5rem;
     }
 
     .hero-content p {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        padding: 0 0.5rem;
+    }
+    
+    .hero-badge {
+        font-size: 0.8rem;
+        padding: 0.6rem 1.2rem;
+        margin-bottom: 1.5rem;
     }
 
     .hero-features {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.75rem;
         align-items: center;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+    
+    .hero-feature {
+        font-size: 0.9rem;
     }
 
     .hero-buttons {
         flex-direction: column;
         width: 100%;
+        gap: 0.75rem;
+        padding: 0 1rem;
     }
 
     .hero-buttons .btn {
         width: 100%;
         justify-content: center;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
     }
 
     .about-content,
@@ -3647,9 +3708,9 @@ body::before {
     }
 
     .hero-content {
-        padding: 8rem 0 4rem;
-        margin-top: 2rem;
-        margin-right: 5%;
+        padding: 2rem 1rem 3rem;
+        margin-top: 0;
+        margin-right: 0;
         text-align: center;
     }
 
@@ -3926,12 +3987,17 @@ body::before {
 
     /* Hero improvements */
     .hero {
-        min-height: 70vh;
-        padding: 2rem 0;
+        min-height: 100vh;
+        padding: 0;
+        margin-top: 0;
     }
 
     .hero-content {
-        padding: 4rem 1rem 3rem;
+        padding: 2rem 1rem 3rem;
+    }
+    
+    .hero-scroll-indicator {
+        display: none;
     }
 
     .hero-badge {
@@ -3941,6 +4007,13 @@ body::before {
 
     /* Navigation improvements */
     .navbar {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-wrapper {
         padding: 0.75rem 0;
     }
 
@@ -3979,12 +4052,40 @@ body::before {
         padding: 0 16px;
     }
 
+    .hero {
+        min-height: 100vh;
+    }
+    
+    .hero-content {
+        padding: 1.5rem 1rem 2.5rem;
+    }
+
     .hero-content h1 {
         font-size: 1.75rem;
+        line-height: 1.2;
     }
 
     .hero-content h2 {
         font-size: 1.1rem;
+        line-height: 1.3;
+    }
+    
+    .hero-content p {
+        font-size: 0.95rem;
+    }
+    
+    .hero-badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .hero-feature {
+        font-size: 0.85rem;
+    }
+    
+    .hero-buttons .btn {
+        padding: 0.9rem 1.25rem;
+        font-size: 0.95rem;
     }
 
     .hero-content p {
