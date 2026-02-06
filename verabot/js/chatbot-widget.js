@@ -2,7 +2,10 @@
 (function() {
     'use strict';
     
-    console.log('Chatbot widget script loaded');
+    // Production mode - disable console logs for better performance
+    const DEBUG = false; // Set to true for debugging
+    const log = DEBUG ? console.log.bind(console) : function() {};
+    const warn = DEBUG ? console.warn.bind(console) : function() {};
     
     // API URL - Dinamički određuje putanju na osnovu trenutne lokacije
     function getApiUrl() {
@@ -18,8 +21,8 @@
             }
         }
         
-        console.log('Script path found:', scriptPath);
-        console.log('Current pathname:', path);
+        log('Script path found:', scriptPath);
+        log('Current pathname:', path);
         
         // Ekstraktuj folder putanju iz script src
         if (scriptPath) {
@@ -34,7 +37,7 @@
             if (match) {
                 const basePath = match[1];
                 const apiPath = basePath + '/api.php';
-                console.log('API URL from script path:', apiPath);
+                log('API URL from script path:', apiPath);
                 return apiPath;
             }
             
@@ -43,7 +46,7 @@
             if (altMatch) {
                 const basePath = altMatch[1] || '';
                 const apiPath = basePath + '/verabot/api.php';
-                console.log('API URL from alternative pattern:', apiPath);
+                log('API URL from alternative pattern:', apiPath);
                 return apiPath;
             }
         }
@@ -53,7 +56,7 @@
         const pathParts = path.split('/').filter(p => p && p !== 'index.html' && !p.includes('.html'));
         const depth = pathParts.length;
         
-        console.log('Path depth:', depth, 'Path parts:', pathParts);
+        log('Path depth:', depth, 'Path parts:', pathParts);
         
         // Build relative path to verabot folder
         if (depth === 0) {
@@ -69,8 +72,8 @@
     // Get API URL - use PHP endpoint as default, Node.js as fallback for Vercel
     let API_URL = getApiUrl();
     
-    console.log('Chatbot API URL:', API_URL);
-    console.log('Hostname:', window.location.hostname);
+    log('Chatbot API URL:', API_URL);
+    log('Hostname:', window.location.hostname);
     
     // Load settings from server or localStorage
     let chatbotSettings = null;
@@ -81,12 +84,12 @@
             const localSettings = localStorage.getItem('chatbotSettings');
             if (localSettings) {
                 chatbotSettings = JSON.parse(localSettings);
-                console.log('Loaded chatbot settings from localStorage');
+                log('Loaded chatbot settings from localStorage');
                 applyChatbotSettings();
                 return true;
             }
         } catch (e) {
-            console.warn('Could not load settings from localStorage:', e);
+            warn('Could not load settings from localStorage:', e);
         }
         
         // Fallback: try to load from server API
@@ -97,10 +100,10 @@
                 chatbotSettings = await response.json();
                 applyChatbotSettings();
             } else {
-                console.warn('Could not load chatbot settings from server, using defaults');
+                warn('Could not load chatbot settings from server, using defaults');
             }
         } catch (e) {
-            console.warn('Could not load chatbot settings from server:', e);
+            warn('Could not load chatbot settings from server:', e);
             // Continue without settings - use defaults
         }
         return true; // Always return true so initialization continues
@@ -119,7 +122,7 @@
                     settings = JSON.parse(localSettings);
                 }
             } catch (e) {
-                console.warn('Could not load from localStorage:', e);
+                warn('Could not load from localStorage:', e);
             }
         }
         
@@ -215,7 +218,7 @@
                 const customConfig = JSON.parse(configText);
                 config = { ...config, ...customConfig };
             } catch (e) {
-                console.warn('Error parsing chatbot config:', e);
+                warn('Error parsing chatbot config:', e);
             }
         }
         
@@ -282,18 +285,18 @@
         // Insert HTML before closing body tag
         if (document.body) {
             document.body.insertAdjacentHTML('beforeend', widgetHTML);
-            console.log('Chatbot HTML inserted');
+            log('Chatbot HTML inserted');
             
             // Verify widget was created
             const widget = document.getElementById('chatbot-widget');
             const toggle = document.getElementById('chatbot-toggle');
-            console.log('Widget created:', !!widget);
-            console.log('Toggle button created:', !!toggle);
+            log('Widget created:', !!widget);
+            log('Toggle button created:', !!toggle);
             
             // Apply settings after HTML is inserted
             setTimeout(applyChatbotSettings, 100);
         } else {
-            console.error('Cannot insert chatbot HTML: document.body not found');
+            if (DEBUG) console.error('Cannot insert chatbot HTML: document.body not found');
         }
     }
     
@@ -301,13 +304,13 @@
     let state = 'closed';
     
     function initChatbot() {
-        console.log('Initializing chatbot...');
-        console.log('Document ready state:', document.readyState);
-        console.log('Document body exists:', !!document.body);
+        log('Initializing chatbot...');
+        log('Document ready state:', document.readyState);
+        log('Document body exists:', !!document.body);
         
         // Check if document.body exists
         if (!document.body) {
-            console.error('document.body not found, waiting...');
+            if (DEBUG) console.error('document.body not found, waiting...');
             setTimeout(initChatbot, 100);
             return;
         }
@@ -315,12 +318,12 @@
         // Check if widget already exists
         const existingWidget = document.getElementById('chatbot-widget');
         if (existingWidget) {
-            console.log('Widget already exists, skipping creation');
+            log('Widget already exists, skipping creation');
             return;
         }
         
         // Create chatbot HTML if it doesn't exist
-        console.log('Creating chatbot HTML...');
+        log('Creating chatbot HTML...');
         createChatbotHTML();
         
         const container = document.getElementById('chatbot-container');
@@ -454,30 +457,30 @@
                 let currentApiUrl = API_URL;
                 const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('meineallrounder.de');
                 
-                console.log('Sending message to PHP API:', currentApiUrl);
+                log('Sending message to PHP API:', currentApiUrl);
                 let response = await fetch(currentApiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: message })
                 });
-                console.log('PHP API response status:', response.status);
+                log('PHP API response status:', response.status);
                 
                 // If PHP API fails on Vercel, try Node.js fallback
                 if (!response.ok && isVercel) {
-                    console.log('PHP API failed on Vercel, trying Node.js fallback...');
+                    log('PHP API failed on Vercel, trying Node.js fallback...');
                     const nodeApiUrl = '/api/chatbot';
                     response = await fetch(nodeApiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: message })
                     });
-                    console.log('Node.js API response status:', response.status);
+                    log('Node.js API response status:', response.status);
                 }
                 
                 if (!response.ok) {
                     
                     const errorText = await response.text();
-                    console.error('API Error:', response.status, errorText);
+                    if (DEBUG) console.error('API Error:', response.status, errorText);
                     
                     let errorMessage = 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
                     
@@ -486,7 +489,7 @@
                         if (errorData.response) {
                             errorMessage = errorData.response;
                         } else if (errorData.error) {
-                            console.error('API Error details:', errorData.error);
+                            if (DEBUG) console.error('API Error details:', errorData.error);
                             if (errorData.error.includes('API Key') || errorData.error.includes('API-Schlüssel')) {
                                 errorMessage = 'Entschuldigung, der Chatbot ist momentan nicht verfügbar. Bitte kontaktieren Sie uns direkt.';
                             }
@@ -512,10 +515,10 @@
                 } else if (data.status === 'success' && data.response) {
                     responseText = data.response;
                 } else if (data.error) {
-                    console.error('API Error:', data.error);
+                    if (DEBUG) console.error('API Error:', data.error);
                     responseText = 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
                 } else {
-                    console.error('Unexpected API response:', data);
+                    if (DEBUG) console.error('Unexpected API response:', data);
                     responseText = 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
                 }
                 
@@ -547,7 +550,7 @@
     
     // Initialize chatbot - load settings in background
     function initializeChatbot() {
-        console.log('Starting chatbot initialization');
+        log('Starting chatbot initialization');
         
         // Load settings (non-blocking)
         loadChatbotSettings();
@@ -559,19 +562,19 @@
     }
     
     // Start initialization when script loads
-    console.log('=== Chatbot Widget Script Loading ===');
-    console.log('Current URL:', window.location.href);
-    console.log('Current pathname:', window.location.pathname);
-    console.log('Document ready state:', document.readyState);
+    log('=== Chatbot Widget Script Loading ===');
+    log('Current URL:', window.location.href);
+    log('Current pathname:', window.location.pathname);
+    log('Document ready state:', document.readyState);
     
     if (document.readyState === 'loading') {
-        console.log('Waiting for DOMContentLoaded...');
+        log('Waiting for DOMContentLoaded...');
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOMContentLoaded fired, initializing chatbot');
+            log('DOMContentLoaded fired, initializing chatbot');
             initializeChatbot();
         });
     } else {
-        console.log('DOM already ready, initializing chatbot');
+        log('DOM already ready, initializing chatbot');
         // Small delay to ensure everything is loaded
         setTimeout(function() {
             initializeChatbot();
