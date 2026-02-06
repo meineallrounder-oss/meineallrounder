@@ -66,19 +66,11 @@
         }
     }
     
-    // Check if we're on Vercel - use Node.js API endpoint
+    // Get API URL - use PHP endpoint as default, Node.js as fallback for Vercel
     let API_URL = getApiUrl();
     
-    // If on Vercel (check for vercel.app domain or custom domain), try Node.js endpoint first
-    if (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('meineallrounder.de')) {
-        // Try Node.js API endpoint first (for Vercel)
-        const nodeApiUrl = '/api/chatbot';
-        console.log('Detected Vercel deployment, trying Node.js API:', nodeApiUrl);
-        // We'll test this URL first, but keep the PHP URL as fallback
-        API_URL = nodeApiUrl;
-    }
-    
     console.log('Chatbot API URL:', API_URL);
+    console.log('Hostname:', window.location.hostname);
     
     // Load settings from server or localStorage
     let chatbotSettings = null;
@@ -459,47 +451,31 @@
             const typing = showTyping();
             
             try {
-                // Try Node.js API first (for Vercel), fallback to PHP
+                // Try PHP API first, then Node.js as fallback for Vercel
                 let currentApiUrl = API_URL;
+                const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('meineallrounder.de');
                 
-                // Check if we should use Node.js API (Vercel)
-                if (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('meineallrounder.de')) {
-                    currentApiUrl = '/api/chatbot';
-                    console.log('Using Node.js API for Vercel:', currentApiUrl);
-                } else {
-                    console.log('Using PHP API:', currentApiUrl);
-                }
-                
-                console.log('Sending message to:', currentApiUrl);
-                const response = await fetch(currentApiUrl, {
+                console.log('Sending message to PHP API:', currentApiUrl);
+                let response = await fetch(currentApiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: message })
                 });
-                console.log('Response status:', response.status);
+                console.log('PHP API response status:', response.status);
+                
+                // If PHP API fails on Vercel, try Node.js fallback
+                if (!response.ok && isVercel) {
+                    console.log('PHP API failed on Vercel, trying Node.js fallback...');
+                    const nodeApiUrl = '/api/chatbot';
+                    response = await fetch(nodeApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: message })
+                    });
+                    console.log('Node.js API response status:', response.status);
+                }
                 
                 if (!response.ok) {
-                    // If Node.js API fails, try PHP fallback
-                    if (currentApiUrl === '/api/chatbot' && response.status === 404) {
-                        console.log('Node.js API not found, trying PHP fallback...');
-                        const phpUrl = getApiUrl();
-                        const fallbackResponse = await fetch(phpUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ message: message })
-                        });
-                        
-                        if (fallbackResponse.ok) {
-                            const fallbackData = await fallbackResponse.json();
-                            hideTyping(typing);
-                            setTimeout(function() {
-                                addMessage(fallbackData.response || fallbackData.message || 'Entschuldigung, es ist ein Fehler aufgetreten.', false);
-                            }, 100);
-                            sendBtn.disabled = false;
-                            input.focus();
-                            return;
-                        }
-                    }
                     
                     const errorText = await response.text();
                     console.error('API Error:', response.status, errorText);
