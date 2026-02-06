@@ -1,0 +1,23 @@
+# Environment files
+.env
+env
+*.env
+verabot/env
+verabot/.env
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+verabot/chat-logs/*.log

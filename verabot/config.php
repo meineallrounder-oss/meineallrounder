@@ -61,7 +61,7 @@ return [
         'universal_color' => '#ea580c',
         'icon_emoji' => '💬',
         'logo_url' => '',
-        'openai_api_key' => 'getenv("OPENAI_API_KEY") ?: ""'
+        'openai_api_key' => getenv('OPENAI_API_KEY') ?: ''
     ]
 ];
 
