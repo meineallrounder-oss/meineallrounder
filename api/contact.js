@@ -87,27 +87,46 @@ module.exports = async function handler(req, res) {
     // Recipient email
     const recipientEmail = 'info@meineallrounder.de';
 
-    // Send email using mailto: link as fallback
-    // For production, integrate with SendGrid, Mailgun, or similar service
-    // For now, we'll use a webhook approach or log it
+    // Send email using Resend (recommended for Vercel)
+    // Alternative: SendGrid, Mailgun, or Nodemailer with SMTP
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
     
-    // Log the submission for debugging
-    console.log('=== Contact Form Submission ===');
-    console.log('To:', recipientEmail);
-    console.log('Subject:', emailSubject);
-    console.log('Body:', emailBody);
-    console.log('==============================');
+    if (RESEND_API_KEY) {
+      // Use Resend API to send email
+      try {
+        const resendResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: 'Meine Allrounder <noreply@meineallrounder.de>',
+            to: [recipientEmail],
+            reply_to: senderEmail,
+            subject: emailSubject,
+            text: emailBody
+          })
+        });
 
-    // In production, you should integrate with a real email service
-    // Options:
-    // 1. SendGrid (recommended) - requires SENDGRID_API_KEY
-    // 2. Mailgun - requires MAILGUN_API_KEY
-    // 3. Nodemailer with SMTP - requires SMTP credentials
-    // 4. Formspree or similar service
-    
-    // For now, we'll return success
-    // The email will be logged in Vercel logs
-    // You can check Vercel logs to see submissions
+        if (!resendResponse.ok) {
+          const errorData = await resendResponse.json();
+          console.error('Resend API error:', errorData);
+          throw new Error('Failed to send email via Resend');
+        }
+      } catch (emailError) {
+        console.error('Email sending error:', emailError);
+        // Continue anyway - log the submission
+      }
+    } else {
+      // Log the submission if no email service is configured
+      console.log('=== Contact Form Submission ===');
+      console.log('To:', recipientEmail);
+      console.log('Subject:', emailSubject);
+      console.log('Body:', emailBody);
+      console.log('Note: RESEND_API_KEY not set. Email not sent.');
+      console.log('==============================');
+    }
 
     // Return success response
     res.status(200).json({
