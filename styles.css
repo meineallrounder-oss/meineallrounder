@@ -305,15 +305,22 @@ body::before {
     }
     
     .hero-overlay {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.2) 0%, rgba(30, 41, 59, 0.15) 100%);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.1) 0%, rgba(30, 41, 59, 0.08) 100%);
     }
     
     .hero::before {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.1) 0%, rgba(30, 41, 59, 0.05) 100%);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.05) 0%, rgba(30, 41, 59, 0.03) 100%);
     }
     
     .hero::after {
-        background: rgba(0, 0, 0, 0.05);
+        background: rgba(0, 0, 0, 0.02);
+    }
+    
+    /* Povećaj kontrast teksta da bude čitljiviji sa svetlijom slikom */
+    .hero-content h1,
+    .hero-content h2,
+    .hero-content p {
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.4);
     }
 }
 
@@ -332,8 +339,8 @@ body::before {
     right: 0;
     bottom: 0;
     background: 
-        radial-gradient(circle at 30% 50%, rgba(234, 88, 12, 0.01) 0%, transparent 50%),
-        linear-gradient(135deg, rgba(15, 23, 42, 0.1) 0%, rgba(30, 41, 59, 0.08) 100%);
+        radial-gradient(circle at 30% 50%, rgba(234, 88, 12, 0.005) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.06) 0%, rgba(30, 41, 59, 0.05) 100%);
     z-index: 0;
 }
 
@@ -354,7 +361,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.25) 0%, rgba(30, 41, 59, 0.2) 100%);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.15) 0%, rgba(30, 41, 59, 0.12) 100%);
 }
 
 .hero-content {
