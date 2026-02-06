@@ -531,6 +531,11 @@ if (navbar) {
 // AOS je uklonjen - svi elementi su vidljivi odmah kroz CSS
 // Show all elements immediately without animation
 document.addEventListener('DOMContentLoaded', function() {
+    // Prevent scroll jump on page load
+    if (window.scrollY === 0) {
+        window.scrollTo(0, 0);
+    }
+    
     const aosElements = document.querySelectorAll('[data-aos]');
     aosElements.forEach(element => {
         element.style.opacity = '1';
