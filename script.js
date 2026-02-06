@@ -277,19 +277,29 @@ function throttle(func, wait) {
     };
 }
 
-// Back to Top Button
+// Back to Top Button - Optimized with Intersection Observer
 const backToTop = document.getElementById('backToTop');
 
 if (backToTop) {
-    const handleScroll = throttle(() => {
-        if (window.pageYOffset > 300) {
-            backToTop.classList.add('show');
-        } else {
-            backToTop.classList.remove('show');
-        }
-    }, 100);
+    // Use Intersection Observer for better performance
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                backToTop.classList.remove('show');
+            } else {
+                backToTop.classList.add('show');
+            }
+        });
+    }, { threshold: 0.1 });
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Create a sentinel element at 300px from top
+    const sentinel = document.createElement('div');
+    sentinel.style.position = 'absolute';
+    sentinel.style.top = '300px';
+    sentinel.style.height = '1px';
+    sentinel.style.width = '1px';
+    document.body.appendChild(sentinel);
+    observer.observe(sentinel);
 
     backToTop.addEventListener('click', () => {
         window.scrollTo({
@@ -299,7 +309,7 @@ if (backToTop) {
     });
 }
 
-// Scroll Progress Bar
+// Scroll Progress Bar - Optimized
 const scrollProgressBar = document.querySelector('.scroll-progress-bar');
 
 if (scrollProgressBar) {
@@ -307,7 +317,7 @@ if (scrollProgressBar) {
         const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
         const scrolled = (window.pageYOffset / windowHeight) * 100;
         scrollProgressBar.style.width = scrolled + '%';
-    }, 50);
+    }, 100); // Increased throttle from 50ms to 100ms for better performance
 
     window.addEventListener('scroll', handleProgressScroll, { passive: true });
 }
