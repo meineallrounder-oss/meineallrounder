@@ -530,7 +530,7 @@
                 
             } catch (error) {
                 hideTyping(typing);
-                console.error('Chatbot error:', error);
+                if (DEBUG) console.error('Chatbot error:', error);
                 setTimeout(function() {
                     addMessage('Entschuldigung, ich konnte keine Verbindung herstellen. Bitte versuchen Sie es erneut.', false);
                 }, 250);
