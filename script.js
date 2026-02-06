@@ -140,7 +140,11 @@ if (contactForm) {
         };
         
         try {
-            const response = await fetch('contact-form.php', {
+            // Use Node.js API on Vercel, PHP fallback for other servers
+            const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('meineallrounder.de');
+            const apiUrl = isVercel ? '/api/contact' : 'contact-form.php';
+            
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -191,7 +195,11 @@ if (quickQuoteForm) {
         };
         
         try {
-            const response = await fetch('contact-form.php', {
+            // Use Node.js API on Vercel, PHP fallback for other servers
+            const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('meineallrounder.de');
+            const apiUrl = isVercel ? '/api/contact' : 'contact-form.php';
+            
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
