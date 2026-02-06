@@ -191,7 +191,6 @@
     window.applyChatbotSettings = function(customSettings) {
         applyChatbotSettings(customSettings);
     };
-    }
     
     // Function to create chatbot HTML structure if it doesn't exist
     function createChatbotHTML() {
