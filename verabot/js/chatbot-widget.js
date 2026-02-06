@@ -335,12 +335,12 @@
         const sendBtn = document.getElementById('chatbot-send');
         
         if (!container || !toggle || !closeBtn || !minimizeBtn || !messages || !input || !sendBtn) {
-            console.error('Chatbot elements not found after creation');
-            console.log('container:', container, 'toggle:', toggle);
+            if (DEBUG) console.error('Chatbot elements not found after creation');
+            log('container:', container, 'toggle:', toggle);
             return;
         }
         
-        console.log('Chatbot elements found, continuing initialization...');
+        log('Chatbot elements found, continuing initialization...');
         
         // Initialize toggle button as visible
         toggle.classList.add('visible');

@@ -1118,33 +1118,18 @@
     <!-- Chatbot Widget JavaScript -->
     <script src="verabot/js/chatbot-widget.js"></script>
     
-    <!-- Debug Script - Remove in production -->
+    <!-- Debug Script - Disabled for better performance -->
+    <!-- Uncomment for debugging if needed -->
+    <!--
     <script>
-        // Check if widget files are loaded
         window.addEventListener('load', function() {
-            console.log('=== Widget Debug Info ===');
-            const cssLink = document.querySelector('link[href*="chatbot-widget.css"]');
-            const jsScript = document.querySelector('script[src*="chatbot-widget.js"]');
-            
-            console.log('CSS link:', cssLink ? cssLink.href : 'NOT FOUND');
-            console.log('JS script:', jsScript ? jsScript.src : 'NOT FOUND');
-            
-            // Check if widget was created
-            setTimeout(function() {
-                const widget = document.getElementById('chatbot-widget');
-                const toggle = document.getElementById('chatbot-toggle');
-                console.log('Widget element:', widget ? 'FOUND' : 'NOT FOUND');
-                console.log('Toggle button:', toggle ? 'FOUND' : 'NOT FOUND');
-                
-                if (widget) {
-                    const style = window.getComputedStyle(widget);
-                    console.log('Widget display:', style.display);
-                    console.log('Widget visibility:', style.visibility);
-                    console.log('Widget z-index:', style.zIndex);
-                }
-            }, 2000);
+            const widget = document.getElementById('chatbot-widget');
+            if (!widget) {
+                console.warn('Chatbot widget not found');
+            }
         });
     </script>
+    -->
 </body>
 </html>
 
