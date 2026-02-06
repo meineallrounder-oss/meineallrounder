@@ -309,15 +309,22 @@ if (backToTop) {
     });
 }
 
-// Scroll Progress Bar - Optimized
+// Scroll Progress Bar - Optimized with requestAnimationFrame
 const scrollProgressBar = document.querySelector('.scroll-progress-bar');
 
 if (scrollProgressBar) {
-    const handleProgressScroll = throttle(() => {
-        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (window.pageYOffset / windowHeight) * 100;
-        scrollProgressBar.style.width = scrolled + '%';
-    }, 100); // Increased throttle from 50ms to 100ms for better performance
+    let ticking = false;
+    const handleProgressScroll = () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (window.pageYOffset / windowHeight) * 100;
+                scrollProgressBar.style.width = scrolled + '%';
+                ticking = false;
+            });
+            ticking = true;
+        }
+    };
 
     window.addEventListener('scroll', handleProgressScroll, { passive: true });
 }
