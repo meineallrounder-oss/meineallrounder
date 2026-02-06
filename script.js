@@ -277,37 +277,7 @@ function throttle(func, wait) {
     };
 }
 
-// Back to Top Button - Optimized with Intersection Observer
-const backToTop = document.getElementById('backToTop');
-
-if (backToTop) {
-    // Use Intersection Observer for better performance
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                backToTop.classList.remove('show');
-            } else {
-                backToTop.classList.add('show');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    // Create a sentinel element at 300px from top
-    const sentinel = document.createElement('div');
-    sentinel.style.position = 'absolute';
-    sentinel.style.top = '300px';
-    sentinel.style.height = '1px';
-    sentinel.style.width = '1px';
-    document.body.appendChild(sentinel);
-    observer.observe(sentinel);
-
-    backToTop.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-}
+// Back to Top Button - Removed
 
 // Scroll Progress Bar - Optimized with requestAnimationFrame
 const scrollProgressBar = document.querySelector('.scroll-progress-bar');
