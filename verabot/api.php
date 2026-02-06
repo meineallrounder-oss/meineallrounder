@@ -70,12 +70,18 @@ if (empty($OPENAI_API_KEY)) {
 if (empty($OPENAI_API_KEY)) {
     http_response_code(500);
     
-    // Debug info (only in development - remove in production)
+    // Debug info for troubleshooting
     $debug_info = [
         'api_key_source' => $api_key_source,
         'config_key_exists' => isset($config['chatbot_settings']['openai_api_key']),
         'config_key_empty' => empty($config['chatbot_settings']['openai_api_key'] ?? ''),
-        'env_files_checked' => []
+        'env_var_exists' => !empty(getenv('OPENAI_API_KEY')),
+        'env_files_checked' => [],
+        'php_version' => phpversion(),
+        'server_info' => [
+            'REQUEST_METHOD' => $_SERVER['REQUEST_METHOD'] ?? 'N/A',
+            'HTTP_HOST' => $_SERVER['HTTP_HOST'] ?? 'N/A',
+        ]
     ];
     
     // Check which env files exist
@@ -96,7 +102,8 @@ if (empty($OPENAI_API_KEY)) {
     echo json_encode([
         'error' => 'API Key not configured',
         'response' => 'Entschuldigung, der Chatbot ist momentan nicht verfügbar. Bitte kontaktieren Sie uns unter ' . $config['contact']['email'],
-        'debug' => $debug_info
+        'debug' => $debug_info,
+        'help' => 'Please check: 1) Vercel Environment Variables has OPENAI_API_KEY set, 2) Redeploy after adding the key'
     ]);
     exit();
 }
