@@ -284,7 +284,7 @@ body::before {
     /* Desktop image - will be overridden for mobile */
     background-image: url('images/header.jpg');
     background-size: cover;
-    background-position: center center;
+    background-position: right center;
     background-repeat: no-repeat;
     background-attachment: scroll;
     color: white;
@@ -327,7 +327,16 @@ body::before {
 /* Tablet image - optional, can use desktop or mobile */
 @media (min-width: 769px) and (max-width: 1024px) {
     .hero {
-        background-image: url('images/header.jpg'); /* Can use tablet-specific image if needed */
+        background-image: url('images/header.jpg');
+        background-position: right center;
+    }
+}
+
+/* Desktop - ensure head is visible */
+@media (min-width: 1025px) {
+    .hero {
+        background-position: right center;
+        background-position-y: center;
     }
 }
 
@@ -371,7 +380,7 @@ body::before {
     padding: 10rem 0 6rem;
     margin: 0 auto;
     text-align: center;
-    animation: fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Animation removed to prevent page jump on load */
 }
 
 .hero-badge {
