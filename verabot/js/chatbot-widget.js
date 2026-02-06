@@ -80,10 +80,24 @@
     
     console.log('Chatbot API URL:', API_URL);
     
-    // Load settings from server
+    // Load settings from server or localStorage
     let chatbotSettings = null;
     
     async function loadChatbotSettings() {
+        // First, try to load from localStorage (set by admin panel)
+        try {
+            const localSettings = localStorage.getItem('chatbotSettings');
+            if (localSettings) {
+                chatbotSettings = JSON.parse(localSettings);
+                console.log('Loaded chatbot settings from localStorage');
+                applyChatbotSettings();
+                return true;
+            }
+        } catch (e) {
+            console.warn('Could not load settings from localStorage:', e);
+        }
+        
+        // Fallback: try to load from server API
         try {
             const settingsUrl = API_URL.replace('/api.php', '/api-settings.php');
             const response = await fetch(settingsUrl);
@@ -91,29 +105,65 @@
                 chatbotSettings = await response.json();
                 applyChatbotSettings();
             } else {
-                console.warn('Could not load chatbot settings, using defaults');
+                console.warn('Could not load chatbot settings from server, using defaults');
             }
         } catch (e) {
-            console.warn('Could not load chatbot settings:', e);
+            console.warn('Could not load chatbot settings from server:', e);
             // Continue without settings - use defaults
         }
         return true; // Always return true so initialization continues
     }
     
     // Apply settings to CSS
-    function applyChatbotSettings() {
+    function applyChatbotSettings(customSettings = null) {
+        // Use custom settings if provided, otherwise use loaded settings, otherwise defaults
+        let settings = customSettings;
+        
+        if (!settings) {
+            // Try localStorage first
+            try {
+                const localSettings = localStorage.getItem('chatbotSettings');
+                if (localSettings) {
+                    settings = JSON.parse(localSettings);
+                }
+            } catch (e) {
+                console.warn('Could not load from localStorage:', e);
+            }
+        }
+        
+        if (!settings) {
+            settings = chatbotSettings;
+        }
+        
         // Use default settings if not loaded yet
-        const settings = chatbotSettings || {
-            header_color: '#ea580c',
-            header_color_secondary: '#fb923c',
-            user_message_color: '#ea580c',
-            user_message_color_secondary: '#fb923c',
-            toggle_button_color: '#ea580c',
-            background_color: '#ffffff',
-            universal_color: '#ea580c',
-            icon_emoji: '💬',
-            logo_url: ''
+        if (!settings) {
+            settings = {
+                headerColor: '#ea580c',
+                headerColorSecondary: '#fb923c',
+                userMessageColor: '#ea580c',
+                userMessageColorSecondary: '#fb923c',
+                toggleButtonColor: '#ea580c',
+                backgroundColor: '#ffffff',
+                universalColor: '#ea580c',
+                iconEmoji: '💬',
+                logoUrl: ''
+            };
+        }
+        
+        // Map settings to expected format (support both camelCase and snake_case)
+        const mappedSettings = {
+            header_color: settings.headerColor || settings.header_color || '#ea580c',
+            header_color_secondary: settings.headerColorSecondary || settings.header_color_secondary || '#fb923c',
+            user_message_color: settings.userMessageColor || settings.user_message_color || '#ea580c',
+            user_message_color_secondary: settings.userMessageColorSecondary || settings.user_message_color_secondary || '#fb923c',
+            toggle_button_color: settings.toggleButtonColor || settings.toggle_button_color || '#ea580c',
+            background_color: settings.backgroundColor || settings.background_color || '#ffffff',
+            universal_color: settings.universalColor || settings.universal_color || '#ea580c',
+            icon_emoji: settings.iconEmoji || settings.icon_emoji || '💬',
+            logo_url: settings.logoUrl || settings.logo_url || ''
         };
+        
+        settings = mappedSettings;
         
         const root = document.documentElement;
         
@@ -140,6 +190,15 @@
                 logoImg.style.display = 'block';
             }
         }
+        
+        // Store settings for external access
+        chatbotSettings = settings;
+    }
+    
+    // Export function for admin panel
+    window.applyChatbotSettings = function(customSettings) {
+        applyChatbotSettings(customSettings);
+    };
     }
     
     // Function to create chatbot HTML structure if it doesn't exist
