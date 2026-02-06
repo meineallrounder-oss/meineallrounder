@@ -195,7 +195,7 @@ ABSOLUTE REGELN:
 
 // Prepare OpenAI API request
 $data = [
-    'model' => 'gpt-4o',
+    'model' => 'gpt-3.5-turbo', // Changed from gpt-4o to gpt-3.5-turbo for better compatibility
     'messages' => [
         [
             'role' => 'system',
