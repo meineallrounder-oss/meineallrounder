@@ -1,0 +1,20 @@
+{
+  "functions": {
+    "verabot/api.php": {
+      "runtime": "php@8.2"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/verabot/api.php",
+      "destination": "/verabot/api.php"
+    },
+    {
+      "source": "/verabot/api-settings.php",
+      "destination": "/verabot/api-settings.php"
+    }
+  ],
+  "env": {
+    "OPENAI_API_KEY": "@openai_api_key"
+  }
+}

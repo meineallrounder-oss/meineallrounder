@@ -23,25 +23,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load configuration
 $config = require __DIR__ . '/config.php';
 
-// Load OpenAI API Key - Check config.php FIRST (highest priority)
+// Load OpenAI API Key - Priority order:
+// 1. Vercel/Server Environment Variable (highest priority for production)
+// 2. config.php chatbot_settings (if set in admin panel)
+// 3. .env files (for local development)
 $OPENAI_API_KEY = '';
 $api_key_source = 'none';
 
-// Check chatbot settings for API key (if set in admin panel) - Highest priority
-// This allows admin panel to override .env file
-if (isset($config['chatbot_settings']['openai_api_key']) && !empty($config['chatbot_settings']['openai_api_key'])) {
+// FIRST: Check environment variable (Vercel uses this!)
+// This is the highest priority for Vercel deployments
+$env_key = getenv('OPENAI_API_KEY');
+if (!empty($env_key)) {
+    $OPENAI_API_KEY = trim($env_key);
+    $api_key_source = 'environment variable (Vercel/Server)';
+}
+
+// SECOND: Check chatbot settings for API key (if set in admin panel)
+if (empty($OPENAI_API_KEY) && isset($config['chatbot_settings']['openai_api_key']) && !empty($config['chatbot_settings']['openai_api_key'])) {
     $OPENAI_API_KEY = trim($config['chatbot_settings']['openai_api_key']);
     $api_key_source = 'config.php';
 }
 
-// If not in config, try .env files
+// THIRD: Try .env files (for local development)
 if (empty($OPENAI_API_KEY)) {
     $env_paths = [
         __DIR__ . '/.env',
         __DIR__ . '/env',  // Also check 'env' without dot
         __DIR__ . '/../.env',
         $_SERVER['DOCUMENT_ROOT'] . '/../.env',
-        '/home/' . get_current_user() . '/.env'
     ];
 
     foreach ($env_paths as $env_path) {
@@ -54,15 +63,6 @@ if (empty($OPENAI_API_KEY)) {
                 break;
             }
         }
-    }
-}
-
-// Fallback to environment variable
-if (empty($OPENAI_API_KEY)) {
-    $env_key = getenv('OPENAI_API_KEY');
-    if (!empty($env_key)) {
-        $OPENAI_API_KEY = $env_key;
-        $api_key_source = 'environment variable';
     }
 }
 
@@ -220,6 +220,8 @@ curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
 $response = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
