@@ -87,8 +87,9 @@ module.exports = async function handler(req, res) {
     // Recipient email
     const recipientEmail = 'info@meineallrounder.de';
 
-    // Send email using Resend (recommended for Vercel)
-    // Alternative: SendGrid, Mailgun, or Nodemailer with SMTP
+    // Send email using Resend (free tier: 3,000 emails/month)
+    // Get API key from: https://resend.com/api-keys
+    // Then add RESEND_API_KEY to Vercel Environment Variables
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
     
     if (RESEND_API_KEY) {
@@ -114,17 +115,31 @@ module.exports = async function handler(req, res) {
           console.error('Resend API error:', errorData);
           throw new Error('Failed to send email via Resend');
         }
+        
+        console.log('Email sent successfully via Resend');
       } catch (emailError) {
         console.error('Email sending error:', emailError);
-        // Continue anyway - log the submission
+        // Log the submission even if email fails
+        console.log('=== Contact Form Submission (Email Failed) ===');
+        console.log('To:', recipientEmail);
+        console.log('Subject:', emailSubject);
+        console.log('Body:', emailBody);
+        console.log('==============================');
       }
     } else {
       // Log the submission if no email service is configured
+      // You can check Vercel logs to see all submissions
       console.log('=== Contact Form Submission ===');
       console.log('To:', recipientEmail);
       console.log('Subject:', emailSubject);
       console.log('Body:', emailBody);
-      console.log('Note: RESEND_API_KEY not set. Email not sent.');
+      console.log('');
+      console.log('⚠️  RESEND_API_KEY not set. Email not sent.');
+      console.log('📧 To enable email sending:');
+      console.log('   1. Sign up at https://resend.com (free)');
+      console.log('   2. Create API key at https://resend.com/api-keys');
+      console.log('   3. Add RESEND_API_KEY to Vercel Environment Variables');
+      console.log('   4. Redeploy the project');
       console.log('==============================');
     }
 
