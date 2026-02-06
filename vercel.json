@@ -2,6 +2,12 @@
   "functions": {
     "verabot/api.php": {
       "runtime": "php@8.2"
+    },
+    "verabot/api-settings.php": {
+      "runtime": "php@8.2"
+    },
+    "verabot/debug-chatbot.php": {
+      "runtime": "php@8.2"
     }
   },
   "rewrites": [
@@ -12,9 +18,10 @@
     {
       "source": "/verabot/api-settings.php",
       "destination": "/verabot/api-settings.php"
+    },
+    {
+      "source": "/verabot/debug-chatbot.php",
+      "destination": "/verabot/debug-chatbot.php"
     }
-  ],
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key"
-  }
+  ]
 }
