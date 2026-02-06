@@ -66,7 +66,18 @@
         }
     }
     
-    const API_URL = getApiUrl();
+    // Check if we're on Vercel - use Node.js API endpoint
+    let API_URL = getApiUrl();
+    
+    // If on Vercel (check for vercel.app domain or custom domain), try Node.js endpoint first
+    if (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('meineallrounder.de')) {
+        // Try Node.js API endpoint first (for Vercel)
+        const nodeApiUrl = '/api/chatbot';
+        console.log('Detected Vercel deployment, trying Node.js API:', nodeApiUrl);
+        // We'll test this URL first, but keep the PHP URL as fallback
+        API_URL = nodeApiUrl;
+    }
+    
     console.log('Chatbot API URL:', API_URL);
     
     // Load settings from server

@@ -1,0 +1,187 @@
+/**
+ * Vercel Serverless Function for Chatbot API
+ * This replaces the PHP endpoint for Vercel deployment
+ */
+
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // Only allow POST
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  // Get API key from environment variable (Vercel)
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+  if (!OPENAI_API_KEY) {
+    res.status(500).json({
+      error: 'API Key not configured',
+      response: 'Entschuldigung, der Chatbot ist momentan nicht verfügbar. Bitte kontaktieren Sie uns unter info@meineallrounder.de',
+      help: 'Please set OPENAI_API_KEY in Vercel Environment Variables'
+    });
+    return;
+  }
+
+  // Get user message
+  const { message } = req.body;
+
+  if (!message || !message.trim()) {
+    res.status(400).json({ error: 'Nachricht ist erforderlich' });
+    return;
+  }
+
+  // Company configuration
+  const config = {
+    company_name: 'Meine Allrounder',
+    website: 'meineallrounder.de',
+    location: 'Moers, Deutschland',
+    address: 'Franzstr. 20, 47441 Moers, Deutschland',
+    contact: {
+      email: 'info@meineallrounder.de',
+      phone: '+49 15211501980'
+    },
+    services: [
+      'Badsanierung',
+      'Fliesenarbeiten',
+      'Gipsarbeiten',
+      'Renovierungsarbeiten',
+      'Montagearbeiten',
+      'Komplette Hausrenovierung'
+    ]
+  };
+
+  // Create system message
+  const services_list = config.services.map(s => `- ${s}`).join('\n');
+  
+  const system_message = `Du bist ein EXTREM freundlicher, professioneller und hilfsbereiter KI-Chatbot-Assistent für ${config.company_name}.
+
+KRITISCHE REGELN - DU MUSST DIESE IMMER BEFOLGEN:
+
+1. SPRACHE - MULTILINGUAL & LJUBAZNO:
+   - Antworte IMMER in der SPRACHE der Frage!
+   - Deutsch → Deutsch, English → English, Serbian → Serbian
+   - WICHTIG: Wenn jemand auf SERBISCH schreibt (z.B. "kako si", "zdravo", "ćao"), antworte IMMER ljubazno auf Serbisch und frage: "Kako ste vi? Kako vam mogu pomoći?"
+   - Sei IMMER höflich, warmherzig und professionell - NICHT wie ein Roboter!
+
+2. ${config.company_name} & UNSERE DIENSTLEISTUNGEN - IMMER IM VORDERGRUND:
+   - Bei JEDER Antwort, die mit ${config.company_name} zu tun hat, stelle IMMER unsere Dienstleistungen in den VORDERGRUND!
+   - Liste Dienstleistungen IMMER strukturiert mit Bullet Points (•) oder Nummern (1., 2., 3.) - NIE als Fließtext!
+
+3. KEINE ZEIT-GESPRÄCHE:
+   - Sprich NIEMALS über aktuelle Uhrzeit, Datum, oder Wetter (außer explizit gefragt)!
+
+4. TEXT-ORGANISATION - PROFESSIONELL:
+   - Verwende IMMER strukturierte Listen (Bullet Points • oder Nummern 1., 2., 3.)
+   - Kurze, klare Sätze
+   - Bei Dienstleistungen: IMMER Liste, NIE Fließtext!
+
+UNTERNEHMENSINFORMATIONEN:
+- Name: ${config.company_name}
+- Website: ${config.website}
+- Standort: ${config.location}
+- Adresse: ${config.address}
+- E-Mail: ${config.contact.email}
+- Telefon: ${config.contact.phone}
+
+DIENSTLEISTUNGEN (IMMER SO LISTEN):
+${services_list}
+
+STIL:
+- Natürlich, warmherzig, menschlich
+- Freundlich und hilfsbereit
+- Professionell strukturiert
+- Emojis sparsam (maximal 1-2 pro Antwort)
+
+ABSOLUTE REGELN:
+- NIEMALS über Zeit/Datum sprechen (außer explizit gefragt)!
+- IMMER ${config.company_name} Dienstleistungen in den Vordergrund stellen!
+- IMMER strukturierte Listen verwenden - NIE Fließtext bei Dienstleistungen!
+- Bei Serbisch: IMMER ljubazno und "Kako ste vi?" fragen!`;
+
+  // Prepare OpenAI API request
+  const data = {
+    model: 'gpt-3.5-turbo',
+    messages: [
+      {
+        role: 'system',
+        content: system_message
+      },
+      {
+        role: 'user',
+        content: message
+      }
+    ],
+    max_tokens: 400,
+    temperature: 0.8
+  };
+
+  try {
+    // Call OpenAI API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const errorMessage = errorData.error?.message || 'Unknown error';
+      const errorType = errorData.error?.type || 'unknown';
+
+      let userMessage = 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
+      
+      if (errorType === 'invalid_api_key' || errorMessage.toLowerCase().includes('api key') || errorMessage.toLowerCase().includes('authentication')) {
+        userMessage = 'Entschuldigung, der API-Schlüssel ist ungültig. Bitte kontaktieren Sie uns unter ' + config.contact.email;
+      } else if (errorType === 'insufficient_quota' || errorMessage.toLowerCase().includes('quota') || errorMessage.toLowerCase().includes('billing')) {
+        userMessage = 'Entschuldigung, das API-Kontingent ist aufgebraucht. Bitte kontaktieren Sie uns unter ' + config.contact.email;
+      } else if (errorType === 'rate_limit_exceeded' || errorMessage.toLowerCase().includes('rate limit')) {
+        userMessage = 'Entschuldigung, zu viele Anfragen. Bitte versuchen Sie es in ein paar Momenten erneut.';
+      }
+
+      res.status(response.status).json({
+        error: 'OpenAI API error: ' + errorMessage,
+        error_type: errorType,
+        response: userMessage
+      });
+      return;
+    }
+
+    const responseData = await response.json();
+
+    if (!responseData.choices || !responseData.choices[0] || !responseData.choices[0].message) {
+      res.status(500).json({
+        error: 'Invalid response from OpenAI',
+        response: 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.'
+      });
+      return;
+    }
+
+    const botResponse = responseData.choices[0].message.content;
+
+    res.status(200).json({
+      response: botResponse,
+      status: 'success'
+    });
+
+  } catch (error) {
+    console.error('Chatbot API error:', error);
+    res.status(500).json({
+      error: 'Connection error: ' + error.message,
+      response: 'Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.'
+    });
+  }
+}
