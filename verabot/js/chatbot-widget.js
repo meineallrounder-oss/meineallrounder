@@ -400,8 +400,19 @@
             const typing = showTyping();
             
             try {
-                console.log('Sending message to:', API_URL);
-                const response = await fetch(API_URL, {
+                // Try Node.js API first (for Vercel), fallback to PHP
+                let currentApiUrl = API_URL;
+                
+                // Check if we should use Node.js API (Vercel)
+                if (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('meineallrounder.de')) {
+                    currentApiUrl = '/api/chatbot';
+                    console.log('Using Node.js API for Vercel:', currentApiUrl);
+                } else {
+                    console.log('Using PHP API:', currentApiUrl);
+                }
+                
+                console.log('Sending message to:', currentApiUrl);
+                const response = await fetch(currentApiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: message })
@@ -409,6 +420,28 @@
                 console.log('Response status:', response.status);
                 
                 if (!response.ok) {
+                    // If Node.js API fails, try PHP fallback
+                    if (currentApiUrl === '/api/chatbot' && response.status === 404) {
+                        console.log('Node.js API not found, trying PHP fallback...');
+                        const phpUrl = getApiUrl();
+                        const fallbackResponse = await fetch(phpUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: message })
+                        });
+                        
+                        if (fallbackResponse.ok) {
+                            const fallbackData = await fallbackResponse.json();
+                            hideTyping(typing);
+                            setTimeout(function() {
+                                addMessage(fallbackData.response || fallbackData.message || 'Entschuldigung, es ist ein Fehler aufgetreten.', false);
+                            }, 100);
+                            sendBtn.disabled = false;
+                            input.focus();
+                            return;
+                        }
+                    }
+                    
                     const errorText = await response.text();
                     console.error('API Error:', response.status, errorText);
                     
@@ -420,7 +453,7 @@
                             errorMessage = errorData.response;
                         } else if (errorData.error) {
                             console.error('API Error details:', errorData.error);
-                            if (errorData.error.includes('API Key')) {
+                            if (errorData.error.includes('API Key') || errorData.error.includes('API-Schlüssel')) {
                                 errorMessage = 'Entschuldigung, der Chatbot ist momentan nicht verfügbar. Bitte kontaktieren Sie uns direkt.';
                             }
                         }
