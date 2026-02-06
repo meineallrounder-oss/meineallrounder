@@ -58,7 +58,7 @@ img[loading="lazy"] {
     --success-color: #059669;
     --gradient-primary: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     --gradient-accent: linear-gradient(135deg, #ea580c 0%, #fb923c 100%);
-    --gradient-hero: linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(30, 41, 59, 0.2) 100%);
+    --gradient-hero: linear-gradient(135deg, rgba(15, 23, 42, 0.25) 0%, rgba(30, 41, 59, 0.15) 100%);
     --gradient-glow: radial-gradient(circle at 50% 50%, rgba(234, 88, 12, 0.1) 0%, transparent 70%);
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -283,8 +283,8 @@ body::before {
     align-items: center;
     /* Desktop image - will be overridden for mobile */
     background-image: url('images/header.jpg');
-    background-size: 110%;
-    background-position: center top;
+    background-size: cover;
+    background-position: center center;
     background-repeat: no-repeat;
     background-attachment: scroll;
     color: white;
@@ -305,11 +305,15 @@ body::before {
     }
     
     .hero-overlay {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(30, 41, 59, 0.6) 100%);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(30, 41, 59, 0.2) 100%);
     }
     
     .hero::before {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.4) 100%);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.15) 0%, rgba(30, 41, 59, 0.1) 100%);
+    }
+    
+    .hero::after {
+        background: rgba(0, 0, 0, 0.1);
     }
 }
 
@@ -328,8 +332,8 @@ body::before {
     right: 0;
     bottom: 0;
     background: 
-        radial-gradient(circle at 30% 50%, rgba(234, 88, 12, 0.03) 0%, transparent 50%),
-        linear-gradient(135deg, rgba(15, 23, 42, 0.25) 0%, rgba(30, 41, 59, 0.15) 100%);
+        radial-gradient(circle at 30% 50%, rgba(234, 88, 12, 0.02) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.15) 0%, rgba(30, 41, 59, 0.1) 100%);
     z-index: 0;
 }
 
@@ -350,7 +354,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--gradient-hero);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(30, 41, 59, 0.3) 100%);
 }
 
 .hero-content {
