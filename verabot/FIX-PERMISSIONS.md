@@ -48,3 +48,5 @@ Ako imate pristup FTP/SFTP klijentu:
    - Files: 644
 3. Rekurzivno primenite na sve podfoldere
 
+
+
