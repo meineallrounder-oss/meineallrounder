@@ -1,27 +1,8 @@
 {
-  "functions": {
-    "verabot/api.php": {
-      "runtime": "php@8.2"
-    },
-    "verabot/api-settings.php": {
-      "runtime": "php@8.2"
-    },
-    "verabot/debug-chatbot.php": {
-      "runtime": "php@8.2"
-    }
-  },
   "rewrites": [
     {
-      "source": "/verabot/api.php",
-      "destination": "/verabot/api.php"
-    },
-    {
-      "source": "/verabot/api-settings.php",
-      "destination": "/verabot/api-settings.php"
-    },
-    {
-      "source": "/verabot/debug-chatbot.php",
-      "destination": "/verabot/debug-chatbot.php"
+      "source": "/api/chatbot",
+      "destination": "/api/chatbot"
     }
   ]
 }
