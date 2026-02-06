@@ -3,7 +3,7 @@
  * This replaces the PHP endpoint for Vercel deployment
  */
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -25,13 +25,21 @@ export default async function handler(req, res) {
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
   if (!OPENAI_API_KEY) {
+    console.error('OPENAI_API_KEY not found in environment variables');
     res.status(500).json({
       error: 'API Key not configured',
       response: 'Entschuldigung, der Chatbot ist momentan nicht verfügbar. Bitte kontaktieren Sie uns unter info@meineallrounder.de',
-      help: 'Please set OPENAI_API_KEY in Vercel Environment Variables'
+      help: 'Please set OPENAI_API_KEY in Vercel Environment Variables',
+      debug: {
+        env_keys: Object.keys(process.env).filter(k => k.includes('OPENAI') || k.includes('API')),
+        has_key: !!process.env.OPENAI_API_KEY
+      }
     });
     return;
   }
+
+  // Log API key status (without exposing the key)
+  console.log('API Key found:', OPENAI_API_KEY ? OPENAI_API_KEY.substring(0, 7) + '...' + OPENAI_API_KEY.substring(OPENAI_API_KEY.length - 4) : 'NOT FOUND');
 
   // Get user message
   const { message } = req.body;
